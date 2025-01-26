@@ -1,0 +1,31 @@
+{
+	"info": {
+		"_postman_id": "6f27a2e0-7f19-408b-8407-3dca6250db41",
+		"name": "Otus_hw3_Anton",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2893117"
+	},
+	"item": [
+		{
+			"name": "CheckHealth",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://arch.homework/otusapp/anton/ping",
+					"protocol": "http",
+					"host": [
+						"arch",
+						"homework"
+					],
+					"path": [
+						"otusapp",
+						"anton",
+						"ping"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
