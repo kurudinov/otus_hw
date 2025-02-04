@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-init-script
+data:
+  init.sql: |
+    create table if not exists public.MY_USERS(
+        Id UUID primary key,
+        FirstName character varying,
+        LastName character varying,
+        Email character varying
+    );
+
+    GRANT TRIGGER, DELETE, SELECT, INSERT, TRUNCATE, UPDATE, REFERENCES ON TABLE public.MY_USERS TO my_user;
+
+    
+
