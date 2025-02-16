@@ -1,0 +1,13 @@
+global:
+  postgresql:
+    auth:
+      postgresPassword: passForAdmin
+      username: my_user
+      password: passForUser
+      database: myDb
+image:
+  tag: "17.0.0"
+primary:
+  persistence:
+    enabled: true
+    size: 1Gi

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-user-app-svc
+  namespace: otus-hw6-anton
+spec:
+  selector:
+    app: my-user-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: my-app-port
+      name: web-port
+  type: NodePort
