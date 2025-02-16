@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-settings
+  namespace: otus-hw6-anton
+data:
+  DB_HOST: "postgres-postgresql"
+  DB_PORT: "5432"
+  DB_NAME: "myDb"
+  METRIC_PORT: "9464"
