@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-user-app
+  namespace: otus-hw6-anton
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: my-user-app
+  template:
+    metadata:
+      labels:
+        app: my-user-app
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: my-user-app
+          image: antonkurudinov/otus_hw6_app:1.7
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8000
+              name: my-app-port
+          livenessProbe:
+            httpGet:
+              port: 8000
+              path: /health
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          envFrom:
+            - configMapRef:
+                name: db-settings
+            - secretRef:
+                name: db-secret
+
