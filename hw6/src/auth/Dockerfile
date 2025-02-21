@@ -10,6 +10,6 @@ RUN npm install
 
 COPY . .
 
-CMD ["node", "src/auth.js"]
+CMD ["node", "auth.js"]
 
 EXPOSE 8001

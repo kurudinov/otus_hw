@@ -1,13 +1,13 @@
 {
 	"info": {
-		"_postman_id": "d0a661f5-5b06-4bd8-8807-9c0cc4b58c9c",
-		"name": "HW6",
+		"_postman_id": "936cfef7-7ce1-46d1-9161-02e855700381",
+		"name": "HW6 v2 Test Kuber",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "2893117"
 	},
 	"item": [
 		{
-			"name": "RegisterUser1",
+			"name": "register user1",
 			"event": [
 				{
 					"listen": "test",
@@ -15,6 +15,7 @@
 						"exec": [
 							"pm.test(\"Status code is 201\", function () {",
 							"    pm.response.to.have.status(201);",
+							"    pm.environment.set(\"user_1_id\", pm.response.json().access_token)",
 							"});"
 						],
 						"type": "text/javascript",
@@ -34,6 +35,9 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -59,7 +63,7 @@
 			"response": []
 		},
 		{
-			"name": "GetProfileAnonymous",
+			"name": "try get profile anonymously",
 			"event": [
 				{
 					"listen": "test",
@@ -72,25 +76,39 @@
 						"type": "text/javascript",
 						"packages": {}
 					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.cookies.clear()"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{baseUrl}}/myUserProfile",
+					"raw": "{{baseUrl}}/profile/myProfile",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"myUserProfile"
+						"profile",
+						"myProfile"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "UpdateProfileAnonumous",
+			"name": "try update profile anonumously",
 			"event": [
 				{
 					"listen": "test",
@@ -103,9 +121,22 @@
 						"type": "text/javascript",
 						"packages": {}
 					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.cookies.clear()"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "PUT",
 				"header": [],
 				"body": {
@@ -118,19 +149,20 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/myUserProfile",
+					"raw": "{{baseUrl}}/profile/myProfile",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"myUserProfile"
+						"profile",
+						"myProfile"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "LoginUser1",
+			"name": "login user1",
 			"event": [
 				{
 					"listen": "test",
@@ -138,19 +170,29 @@
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
-							"    pm.environment.set(\"user_1_token\", pm.response.json().token)",
+							"    pm.environment.set(\"user_1_token\", pm.response.json().access_token)",
 							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.cookies.clear()"
 						],
 						"type": "text/javascript",
 						"packages": {}
 					}
 				}
 			],
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
 			"request": {
-				"method": "GET",
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
@@ -175,7 +217,7 @@
 			"response": []
 		},
 		{
-			"name": "UpdateProfileForUser1",
+			"name": "update profile for user1",
 			"event": [
 				{
 					"listen": "test",
@@ -184,6 +226,16 @@
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
 							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -205,7 +257,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"firstName\": \"NewName\",\n    \"lastName\": \"Алексей\",\n    \"email\": \"{{user_1_login}}\",\n    \"password\": \"{{user_1_password}}\"\n}",
+					"raw": "{\n    \"age\": 20,\n    \"sex\": \"M\",\n    \"avatarUri\": \"https://avatars.com/1000000123.png\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -213,19 +265,20 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/myUserProfile",
+					"raw": "{{baseUrl}}/profile/myProfile",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"myUserProfile"
+						"profile",
+						"myProfile"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "GetUpdatedProfileForUser1",
+			"name": "check updated profile for user1",
 			"event": [
 				{
 					"listen": "test",
@@ -234,10 +287,20 @@
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
 							"});",
-							"pm.test(\"Assert new firstName value\", function () {",
+							"pm.test(\"Assert new value for user age\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.firstName).to.eql(\"NewName\");",
+							"    pm.expect(jsonData.age).to.eql(20);",
 							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -258,19 +321,65 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{baseUrl}}/myUserProfile",
+					"raw": "{{baseUrl}}/profile/myProfile",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"myUserProfile"
+						"profile",
+						"myProfile"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "RegisterUser2",
+			"name": "logout user1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/auth/logout",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"auth",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "register user2",
 			"event": [
 				{
 					"listen": "test",
@@ -288,6 +397,7 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
+							"pm.cookies.clear()",
 							"pm.environment.set(\"user_2_login\", \"user_\" + Date.now() + \"@mail.ru\")",
 							"pm.environment.set(\"user_2_password\", Date.now())"
 						],
@@ -297,6 +407,9 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -322,7 +435,7 @@
 			"response": []
 		},
 		{
-			"name": "LoginUser2",
+			"name": "login user2",
 			"event": [
 				{
 					"listen": "test",
@@ -330,7 +443,7 @@
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
-							"    pm.environment.set(\"user_2_token\", pm.response.json().token)",
+							"    pm.environment.set(\"user_2_token\", pm.response.json().access_token)",
 							"});"
 						],
 						"type": "text/javascript",
@@ -341,18 +454,18 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							""
+							"pm.cookies.clear()"
 						],
 						"type": "text/javascript",
 						"packages": {}
 					}
 				}
 			],
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
 			"request": {
-				"method": "GET",
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
@@ -377,7 +490,7 @@
 			"response": []
 		},
 		{
-			"name": "GetProfileForUser2CompareToUser1",
+			"name": "get profile for user2, compare to user1",
 			"event": [
 				{
 					"listen": "test",
@@ -386,9 +499,9 @@
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
 							"});",
-							"pm.test(\"Assert user 2 != user 1\", function () {",
+							"pm.test(\"Assert current user id != user_1_id\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.email).to.not.eq(pm.environment.get(\"user_1_login\"));",
+							"    pm.expect(jsonData.id).to.not.eq(pm.environment.get(\"user_1_id\"));",
 							"});"
 						],
 						"type": "text/javascript",
@@ -420,12 +533,58 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{baseUrl}}/myUserProfile",
+					"raw": "{{baseUrl}}/profile/myProfile",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"myUserProfile"
+						"profile",
+						"myProfile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "logout user2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/auth/logout",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"auth",
+						"logout"
 					]
 				}
 			},

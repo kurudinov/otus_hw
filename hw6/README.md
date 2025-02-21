@@ -1,16 +1,18 @@
-# Homework #5
+# Homework #6
 
-Архитекурная схема:
-![Архитекурная схема](Arch_schema.jpg?raw=true "Архитекурная схема")
-Файл **Arch_schema.jpg**
+Доработано ДЗ #6 по замечаниям:
+- Реализована выдача JWT сервисом Auth и его проверка сервисом Profile (сервис работы с профилем пользователя)
+- Отказался от использования nginx-ingress для установки аутентифицирующих headers
+- Микросервисы Auth и Profile теперь полностью разнесены: по разным веткам кода и схемам БД 
+- JWT дополнительно записывается в cookie "access_token" для удобства клиента
+- реализован метод logout, который чистит cookie "access_token" на клиенте
 
-Реализованы 2 сервиса: App и Auth
+Новая архитекурная схема:
+![Архитекурная схема](Arch_schema_v2.jpg?raw=true "Архитекурная схема")
+Файл **Arch_schema_v2.jpg**
 
-В качестве API Gateway используется nginx-ingress. 
-Запросы на регистрацию и аутентифиакцию (получение JWT токена по логину/паролю) проксируются на Auth без изменений.
-Запросы к бизнес-сервису App перенаправляются в сервис Auth. Он валидирует JWT токен и в случае успеха добавляет заголовки: X-UserId, X-UserEmail, X-UserRoles. Далее запрос с доп.заголовками перенаправляется к бизнес-сервису. Бизнес-сервис App использует заголовок X-UserId для определения контекста текущего пользователя и работы с его профилем.
 
-Образ на Docker hub: **antonkurudinov/otus_hw6_app:1.7** и **antonkurudinov/otus_hw6_auth:1.7**
+Образы на Docker hub: **antonkurudinov/otus_hw6_profile:2.3** и **antonkurudinov/otus_hw6_auth:1.7**
 Собраны под 2 платформы: **linux/amd64**, **linux/arm64/v8**
 
 
@@ -32,13 +34,16 @@ kubectl apply -f ./kuber
 ```
 
 # Тестирование приложения
-Запуск коллекции newman с учатновкой переменной _baseUrl_ = http://arch.homework
+Запуск коллекции newman с установкой переменной _baseUrl_ = http://arch.homework
 ```
-newman run HW6.postman_collection.json --env-var baseUrl=http://arch.homework
+newman run HW6v2.postman_collection.json --env-var baseUrl=http://arch.homework --verbose
 ```
 
-Результат (скриншот) в файле **newman_test_results.png**.
-![Результат](newman_test_results.png?raw=true "Результат")
+Результат (скриншот) в файлах **newman_results_X.png**.
+![Результат 1](newman_results_1.png?raw=true "Результат 1")
+![Результат 2](newman_results_2.png?raw=true "Результат 2")
+![Результат 3](newman_results_3.png?raw=true "Результат 3")
+![Результат 4](newman_results_4.png?raw=true "Результат 4")
 
 # Удаление приложения (всего содержимого namespace)
 ```

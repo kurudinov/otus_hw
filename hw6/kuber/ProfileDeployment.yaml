@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: my-user-app
+  name: profile-app
   namespace: otus-hw6-anton
 spec:
   replicas: 1
@@ -12,16 +12,16 @@ spec:
       maxUnavailable: 1
   selector:
     matchLabels:
-      app: my-user-app
+      app: profile-app
   template:
     metadata:
       labels:
-        app: my-user-app
+        app: profile-app
     spec:
       automountServiceAccountToken: false
       containers:
-        - name: my-user-app
-          image: antonkurudinov/otus_hw6_app:1.7
+        - name: profile-app
+          image: antonkurudinov/otus_hw6_profile:2.3
           resources:
             requests:
               memory: "64Mi"
@@ -31,11 +31,11 @@ spec:
               cpu: "500m"
           ports:
             - containerPort: 8000
-              name: my-app-port
+              name: profile-port
           livenessProbe:
             httpGet:
               port: 8000
-              path: /health
+              path: /profile/health
             initialDelaySeconds: 10
             periodSeconds: 10
           envFrom:

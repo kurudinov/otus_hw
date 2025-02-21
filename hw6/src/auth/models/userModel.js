@@ -1,7 +1,7 @@
 const db = require('../config/db');
 
 
-const USERS_TABLE = "my_users";
+const USERS_TABLE = "auth.Users";
 
 exports.getAllUsers = function(callback) {
     db.query(`SELECT * FROM ${USERS_TABLE}`, callback);
