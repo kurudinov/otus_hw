@@ -1,21 +1,25 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: auth-service-ingress
+  name: app-ingress
   namespace: otus-hw6-anton
-  annotations:
-    nginx.ingress.kubernetes.io/auth-url: "http://my-auth-svc.otus-hw6-anton.svc.cluster.local/auth/validateToken"
-    nginx.ingress.kubernetes.io/auth-response-headers: "X-UserEmail,X-UserId,X-UserRoles"
 spec:
   ingressClassName: nginx
   rules:
     - host: arch.homework
       http:
         paths:
-          - path: /
+          - path: /auth
             pathType: Prefix
             backend:
               service:
-                name: my-user-app-svc
+                name: auth-svc
+                port:
+                  number: 80
+          - path: /profile
+            pathType: Prefix
+            backend:
+              service:
+                name: profile-svc
                 port:
                   number: 80

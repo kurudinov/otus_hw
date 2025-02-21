@@ -10,6 +10,6 @@ RUN npm install
 
 COPY . .
 
-CMD ["node", "src/index.js"]
+CMD ["node", "profile.js"]
 
 EXPOSE 8000

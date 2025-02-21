@@ -1,18 +1,29 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: db-init-script
+  name: init-db-script
   namespace: otus-hw6-anton
 data:
   init.sql: |
-    create table if not exists public.my_users(
+    create schema auth;
+
+    create table if not exists auth.Users(
         "Id" UUID primary key,
         "FirstName" character varying,
         "LastName" character varying,
         "Email" character varying,
         "Password" character varying,
-        "Roles" character varying);
+        "Roles" character varying,
+        CONSTRAINT EMAIL_UNIQUE UNIQUE ("Email"));
 
-    ALTER TABLE public.my_users ADD CONSTRAINT Email_UNIQUE UNIQUE ("Email");
+    GRANT TRIGGER, DELETE, SELECT, INSERT, TRUNCATE, UPDATE, REFERENCES ON TABLE auth.Users TO my_user;  
 
-    GRANT TRIGGER, DELETE, SELECT, INSERT, TRUNCATE, UPDATE, REFERENCES ON TABLE public.MY_USERS TO my_user;  
+    create schema profile;
+
+    create table if not exists profile.Profiles(
+        "UserId" UUID primary key,
+        "Age" int,
+        "Sex" character varying,
+        "AvatarUri" character varying);
+
+    GRANT TRIGGER, DELETE, SELECT, INSERT, TRUNCATE, UPDATE, REFERENCES ON TABLE profile.Profile TO my_user;  

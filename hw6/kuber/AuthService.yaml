@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: my-auth-svc
+  name: auth-svc
   namespace: otus-hw6-anton
 spec:
   selector:
-    app: my-auth-app
+    app: auth-app
   ports:
     - protocol: TCP
       port: 80
-      targetPort: my-auth-port
+      targetPort: auth-port
       name: web-auth-port
   type: NodePort

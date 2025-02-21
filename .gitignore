@@ -34,3 +34,6 @@ work*
 .env
 package-lock.json
 package.json
+jsconfig.json
+.gitignore
+.vscode/settings.json
