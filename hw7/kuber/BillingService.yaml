@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: billing-svc
+  namespace: otus-anton
+spec:
+  selector:
+    app: billing-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: billing-port
+      name: web-billing-port
+  type: NodePort
