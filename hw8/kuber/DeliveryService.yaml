@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: delivery-svc
+  namespace: otus-anton
+spec:
+  selector:
+    app: delivery-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: delivery-port
+      name: web-delivery-port
+  type: NodePort

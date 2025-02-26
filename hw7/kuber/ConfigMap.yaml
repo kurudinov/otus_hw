@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-settings
+  namespace: otus-anton
+data:
+  DB_HOST: "postgres-postgresql"
+  DB_PORT: "5432"
+  DB_NAME: "myDb"
+  METRIC_PORT: "9464"
+  KAFKA_HOST: "franz-kafka"
+  KAFKA_PORT: "9092"

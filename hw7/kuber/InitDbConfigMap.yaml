@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: init-db-script
+  namespace: otus-anton
+data:
+  init.sql: |
+    create schema if not exists "auth";
+
+    create table if not exists "auth"."Users"(
+      "Id" UUID primary key,
+      "FirstName" character varying,
+      "LastName" character varying,
+      "Email" character varying,
+      "Password" character varying,
+      "Roles" character varying,
+      CONSTRAINT USER_EMAIL_UNIQUE UNIQUE ("Email"));
+
+    GRANT TRIGGER, DELETE, SELECT, INSERT, TRUNCATE, UPDATE, REFERENCES ON TABLE "auth"."Users" TO my_user;  
+
+    create schema if not exists "profile";
+
+    create table if not exists "profile"."Profiles"(
+      "UserId" UUID primary key,
+      "Age" int,
+      "Sex" character varying,
+      "AvatarUri" character varying);
+
+    GRANT TRIGGER, DELETE, SELECT, INSERT, TRUNCATE, UPDATE, REFERENCES ON TABLE profile.Profile TO my_user;  
+
+    create schema if not exists "order";
+
+    create table if not exists "order"."Orders"(
+    	"Id" UUID primary key,
+    	"Number" serial,
+      "UserId" UUID not null,
+      "CreatedAt" timestamp not null,
+      "UpdatedAt" timestamp,
+      "Sum" decimal(12,2) not null,
+    	"Status" character varying,
+    	"Name" character varying);
+
+    GRANT TRIGGER, DELETE, SELECT, INSERT, TRUNCATE, UPDATE, REFERENCES ON TABLE "order"."Orders" TO my_user;  
+
+    create schema if not exists "notif";
+    
+    create table if not exists "notif"."Notifications"(
+    	"Id" UUID primary key,
+    	"Timestamp" timestamp not null,
+      "UserId" UUID not null,
+    	"Text" character varying,
+    	"IsRead" bool default false);
+
+    GRANT TRIGGER, DELETE, SELECT, INSERT, TRUNCATE, UPDATE, REFERENCES ON TABLE "notif"."Notifications" TO my_user;
+
+    create schema if not exists "billing";
+    
+    create table if not exists billing.Wallet(
+      "UserId" UUID primary key,
+      "Balance" decimal(12,2) not null default 0.0
+    );
+
+    GRANT TRIGGER, DELETE, SELECT, INSERT, TRUNCATE, UPDATE, REFERENCES ON TABLE billing.Wallet TO my_user;
+
+    create table if not exists billing.Transactions(
+      "Id" UUID primary key,
+      "UserId" UUID not null,
+      "Amount" decimal(12,2) not null,
+      "OldBalance" decimal(12,2) not null,
+      "NewBalance" decimal(12,2) not null,
+      "Timestamp" timestamp not null,
+      "Info" character varying
+    );
+
+    grant TRIGGER, DELETE, SELECT, INSERT, TRUNCATE, UPDATE, REFERENCES ON TABLE billing.Transactions TO my_user;
+
+    create table if not exists billing.OrderPayment(
+      "OrderId" UUID primary key,
+      "OrderNumber" bigint,
+      "Timestamp" timestamp not null
+    );
+
+    GRANT TRIGGER, DELETE, SELECT, INSERT, TRUNCATE, UPDATE, REFERENCES ON TABLE billing.OrderPayment TO my_user;
