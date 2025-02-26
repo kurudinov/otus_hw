@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notif-app
+  namespace: otus-anton
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: notif-app
+  template:
+    metadata:
+      labels:
+        app: notif-app
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: notif-app
+          image: antonkurudinov/otus_hw8_notif:1.1
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8004
+              name: notif-port
+          livenessProbe:
+            httpGet:
+              port: 8004
+              path: /notif/health
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          envFrom:
+            - configMapRef:
+                name: db-settings
+            - secretRef:
+                name: db-secret
+
