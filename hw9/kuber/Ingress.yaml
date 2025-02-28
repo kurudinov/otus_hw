@@ -1,0 +1,61 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-ingress
+  namespace: otus-anton
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: arch.homework
+      http:
+        paths:
+          - path: /auth
+            pathType: Prefix
+            backend:
+              service:
+                name: auth-svc
+                port:
+                  number: 80
+          - path: /profile
+            pathType: Prefix
+            backend:
+              service:
+                name: profile-svc
+                port:
+                  number: 80
+          - path: /billing
+            pathType: Prefix
+            backend:
+              service:
+                name: billing-svc
+                port:
+                  number: 80  
+          - path: /notif
+            pathType: Prefix
+            backend:
+              service:
+                name: notif-svc
+                port:
+                  number: 80  
+          - path: /order
+            pathType: Prefix
+            backend:
+              service:
+                name: order-svc
+                port:
+                  number: 80
+          - path: /erp
+            pathType: Prefix
+            backend:
+              service:
+                name: erp-svc
+                port:
+                  number: 80   
+          - path: /delivery
+            pathType: Prefix
+            backend:
+              service:
+                name: delivery-svc
+                port:
+                  number: 80           
+                

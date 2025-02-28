@@ -1,0 +1,511 @@
+{
+	"info": {
+		"_postman_id": "1f69f434-eee6-41d1-a911-80b7863b4495",
+		"name": "HW9",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2893117"
+	},
+	"item": [
+		{
+			"name": "Registration, login, initial balance",
+			"item": [
+				{
+					"name": "register user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"    pm.variables.set(\"user_1_id\", pm.response.json().access_token)",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var baseUrl = pm.environment.get(\"baseUrl\");",
+									"console.log(\"baseUrl: \" + baseUrl);",
+									"",
+									"if (baseUrl && baseUrl !== '') {",
+									"    console.log(\"setting url* = baseUrl\");",
+									"",
+									"    pm.environment.set(\"authUrl\", baseUrl);",
+									"    pm.environment.set(\"profileUrl\", baseUrl);",
+									"    pm.environment.set(\"orderUrl\", baseUrl);",
+									"    pm.environment.set(\"deliveryUrl\", baseUrl);",
+									"    pm.environment.set(\"notifUrl\", baseUrl);",
+									"    pm.environment.set(\"erpUrl\", baseUrl);",
+									"    pm.environment.set(\"billingUrl\", baseUrl);",
+									"}  else {",
+									"    console.log(\"setting custom url* for local apps\");",
+									"",
+									"    pm.environment.set(\"authUrl\", \"http://localhost:8001\");",
+									"    pm.environment.set(\"profileUrl\", \"http://localhost:8000\");",
+									"    pm.environment.set(\"orderUrl\", \"http://localhost:8003\");",
+									"    pm.environment.set(\"deliveryUrl\", \"http://localhost:8006\");",
+									"    pm.environment.set(\"notifUrl\", \"http://localhost:8004\");",
+									"    pm.environment.set(\"erpUrl\", \"http://localhost:8005\");",
+									"    pm.environment.set(\"billingUrl\", \"http://localhost:8002\");",
+									"}",
+									"",
+									"pm.variables.set(\"user_1_login\", \"user_\" + Date.now() + \"@mail.ru\")",
+									"pm.variables.set(\"user_1_password\", Date.now())"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{user_1_login}}\",\n    \"password\": \"{{user_1_password}}\",\n    \"firstName\": \"Ivan\",\n    \"lastName\": \"Bezrukov\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{authUrl}}/auth/register",
+							"host": [
+								"{{authUrl}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    pm.variables.set(\"user_1_token\", pm.response.json().access_token)",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.cookies.clear()"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"login\": \"{{user_1_login}}\",\n    \"password\": \"{{user_1_password}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{authUrl}}/auth/getToken",
+							"host": [
+								"{{authUrl}}"
+							],
+							"path": [
+								"auth",
+								"getToken"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "wait 3s... add balance 100 [RUB]",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"setTimeout(function(){}, 3000);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{user_1_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": 100.00,\n    \"info\": \"Creadit card: XXXX YYYY ZZZZ MMMM\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{billingUrl}}/billing/addBalance",
+							"host": [
+								"{{billingUrl}}"
+							],
+							"path": [
+								"billing",
+								"addBalance"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Order Idempotence Test",
+			"item": [
+				{
+					"name": "create order without X-RequestId",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{user_1_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productCode\": \"1\",\n    \"quantity\": 1,\n    \"name\": \"order that should be executed\",\n    \"deliveryDate\": \"2025-03-30\",\n    \"address\": \"Moscow, Lenina 2\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{orderUrl}}/order/create",
+							"host": [
+								"{{orderUrl}}"
+							],
+							"path": [
+								"order",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create order with X-RequestId",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);    ",
+									"});",
+									"",
+									"// save order Number",
+									"pm.variables.set(\"orderNum\", pm.response.json().orderNumber);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var uuid = require('uuid');",
+									"pm.variables.set(\"guid1\", uuid.v4());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{user_1_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-RequestId",
+								"value": "{{guid1}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productCode\": \"1\",\n    \"quantity\": 1,\n    \"name\": \"order that should be executed\",\n    \"deliveryDate\": \"2025-03-30\",\n    \"address\": \"Moscow, Lenina 2\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{orderUrl}}/order/create",
+							"host": [
+								"{{orderUrl}}"
+							],
+							"path": [
+								"order",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create order with the same X-RequestId as before",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Assert returned order Number is the same as before\", function () {",
+									"    var prevOrderNum = pm.variables.get(\"prevOrderNum\")",
+									"    var orderNum = pm.response.json().orderNumber;",
+									"",
+									"    // save order Number",
+									"    pm.variables.set(\"orderNum\", orderNum);",
+									"    ",
+									"    console.log(\"prevOrderNum: \" + prevOrderNum);",
+									"    console.log(\"orderNum: \" + orderNum);",
+									"    ",
+									"    pm.expect(orderNum).to.eq(prevOrderNum);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// save previous order number",
+									"pm.variables.set(\"prevOrderNum\", pm.variables.get(\"orderNum\"));"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{user_1_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-RequestId",
+								"value": "{{guid1}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productCode\": \"1\",\n    \"quantity\": 1,\n    \"name\": \"order that should be executed\",\n    \"deliveryDate\": \"2025-03-30\",\n    \"address\": \"Moscow, Lenina 2\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{orderUrl}}/order/create",
+							"host": [
+								"{{orderUrl}}"
+							],
+							"path": [
+								"order",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create order with new X-RequestId",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Assert returned order Number is increased\", function () {",
+									"    var prevOrderNum = pm.variables.get(\"prevOrderNum\");",
+									"    var orderNum = pm.response.json().orderNumber;",
+									"    ",
+									"    console.log(\"prevOrderNum: \" + prevOrderNum);",
+									"    console.log(\"orderNum: \" + orderNum);",
+									"    ",
+									"    pm.expect(orderNum).to.gt(prevOrderNum);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.variables.set(\"prevOrderNum\", pm.variables.get(\"orderNum\"));"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{user_1_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-RequestId",
+								"value": "{{$guid}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productCode\": \"1\",\n    \"quantity\": 1,\n    \"name\": \"order that should be executed\",\n    \"deliveryDate\": \"2025-03-30\",\n    \"address\": \"Moscow, Lenina 2\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{orderUrl}}/order/create",
+							"host": [
+								"{{orderUrl}}"
+							],
+							"path": [
+								"order",
+								"create"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
