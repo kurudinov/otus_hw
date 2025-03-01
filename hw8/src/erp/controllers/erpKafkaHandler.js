@@ -49,8 +49,6 @@ const runKafkaConsumer = async () => {
                 handleEventReservationCancel(message);
             }
 
-            // TODO: erp event handlers
-
         }
     });
 };
@@ -64,7 +62,7 @@ var handleEventReservationRequest = async function (message) {
 
         const result = await erpModel.createReservation(msg.orderNumber, msg.productCode, msg.quantity);
         if (result === 'SUCCESS') {
-            await sendEventReservationResult(msg.orderNumber, 'SUCCESS', ''); // TODO: provide reservation number to kafka
+            await sendEventReservationResult(msg.orderNumber, 'SUCCESS', '');
         } else {
             await sendEventReservationResult(msg.orderNumber, 'ERROR', result);
         }

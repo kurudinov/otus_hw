@@ -46,8 +46,6 @@ exports.createOrder = async function (req, res, next) {
 
         let sum = prodInfo.Price * req.body.quantity;
 
-        // TODO: отправлять тот же JSON, если найден 'X-RequestId'
-
         orderModel.createOrder(req.user.id, sum, req.body.name, req.body.productCode, prodInfo.Name,
             req.body.quantity, req.body.deliveryDate, req.body.address, req.headers['x-requestid'], (err, result) => {
                 if (err) {
