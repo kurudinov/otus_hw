@@ -29,7 +29,7 @@ const connectProducerToKafka = async () => {
 
 groupRnd = (Math.random() + 1).toString(36).substring(7);
 const consumer = kafka.consumer({ 
-    groupId: 'erp_' + groupRnd, 
+    groupId: 'erp', // + groupRnd, 
     allowAutoTopicCreation: true
 });
 

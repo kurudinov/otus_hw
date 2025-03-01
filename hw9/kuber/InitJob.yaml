@@ -1,0 +1,62 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: init-db-job
+  namespace: otus-anton
+spec:
+  completions: 1
+  parallelism: 1
+  backoffLimit: 5
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: pg-init-tables
+          image: postgres:17.0
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: DB_PASSWORD
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: DB_USER
+            - name: PGHOST
+              valueFrom:
+                configMapKeyRef:
+                  name: db-settings
+                  key: DB_HOST
+            - name: DBNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: db-settings
+                  key: DB_NAME
+          command: ["/bin/bash", "-c"]
+          args:
+            - psql -d "$DBNAME" -f /scripts/init.sql
+          volumeMounts:
+            - name: sql-script
+              mountPath: /scripts
+        - name: pg-init-kafka-topics
+          image: docker.io/bitnami/kafka:3.9.0-debian-12-r10
+          command: ["/bin/bash", "-c"]
+          args:
+            - >- 
+              kafka-topics.sh --create --bootstrap-server franz-kafka.otus-anton.svc.cluster.local:9092 --topic auth.user.registered &&
+              kafka-topics.sh --create --bootstrap-server franz-kafka.otus-anton.svc.cluster.local:9092 --topic order.status.changed &&
+              kafka-topics.sh --create --bootstrap-server franz-kafka.otus-anton.svc.cluster.local:9092 --topic billing.payment.request &&
+              kafka-topics.sh --create --bootstrap-server franz-kafka.otus-anton.svc.cluster.local:9092 --topic billing.payment.result &&
+              kafka-topics.sh --create --bootstrap-server franz-kafka.otus-anton.svc.cluster.local:9092 --topic billing.return.request &&
+              kafka-topics.sh --create --bootstrap-server franz-kafka.otus-anton.svc.cluster.local:9092 --topic billing.return.result &&
+              kafka-topics.sh --create --bootstrap-server franz-kafka.otus-anton.svc.cluster.local:9092 --topic erp.reservation.request &&
+              kafka-topics.sh --create --bootstrap-server franz-kafka.otus-anton.svc.cluster.local:9092 --topic erp.reservation.result &&
+              kafka-topics.sh --create --bootstrap-server franz-kafka.otus-anton.svc.cluster.local:9092 --topic erp.reservation.cancel &&
+              kafka-topics.sh --create --bootstrap-server franz-kafka.otus-anton.svc.cluster.local:9092 --topic delivery.booking.request &&
+              kafka-topics.sh --create --bootstrap-server franz-kafka.otus-anton.svc.cluster.local:9092 --topic delivery.booking.result
+      volumes:
+        - name: sql-script
+          configMap:
+            name: init-db-script
