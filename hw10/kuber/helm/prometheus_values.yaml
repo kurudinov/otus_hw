@@ -1,0 +1,42 @@
+alertmanager:
+  enabled: false
+server:
+  service:
+    type: "NodePort"
+  extraScrapeConfigs:
+    - job_name: 'auth'
+      scrape_interval: 5s
+      metrics_path: /metrics
+      static_configs:
+        - targets: [ 'auth-svc' ]
+    - job_name: 'billing'
+      scrape_interval: 5s
+      metrics_path: /metrics
+      static_configs:
+        - targets: [ 'billing-svc' ]
+    - job_name: 'delivery'
+      scrape_interval: 5s
+      metrics_path: /metrics
+      static_configs:
+        - targets: [ 'delivery-svc' ]
+    - job_name: 'erp'
+      scrape_interval: 5s
+      metrics_path: /metrics
+      static_configs:
+        - targets: [ 'erp-svc' ]
+    - job_name: 'notif'
+      scrape_interval: 5s
+      metrics_path: /metrics
+      static_configs:
+        - targets: [ 'notif-svc' ]
+    - job_name: 'order'
+      scrape_interval: 5s
+      metrics_path: /metrics
+      static_configs:
+        - targets: [ 'order-svc' ]
+    - job_name: 'profile'
+      scrape_interval: 5s
+      metrics_path: /metrics
+      static_configs:
+        - targets: [ 'profile-svc' ]
+    

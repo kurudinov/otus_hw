@@ -1,0 +1,2089 @@
+{
+	"info": {
+		"_postman_id": "08a9515c-5d60-4dc5-b067-e27d59a2f909",
+		"name": "HW10 FULL Automated",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2893117"
+	},
+	"item": [
+		{
+			"name": "Registration, login, initial balance",
+			"item": [
+				{
+					"name": "register user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"    pm.variables.set(\"user_1_id\", pm.response.json().access_token)",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var baseUrl = pm.environment.get(\"baseUrl\");",
+									"console.log(\"baseUrl: \" + baseUrl);",
+									"",
+									"if (baseUrl && baseUrl !== '') {",
+									"    console.log(\"setting url* = baseUrl\");",
+									"",
+									"    pm.environment.set(\"authUrl\", baseUrl);",
+									"    pm.environment.set(\"profileUrl\", baseUrl);",
+									"    pm.environment.set(\"orderUrl\", baseUrl);",
+									"    pm.environment.set(\"deliveryUrl\", baseUrl);",
+									"    pm.environment.set(\"notifUrl\", baseUrl);",
+									"    pm.environment.set(\"erpUrl\", baseUrl);",
+									"    pm.environment.set(\"billingUrl\", baseUrl);",
+									"}  else {",
+									"    console.log(\"setting custom url* for local apps\");",
+									"",
+									"    pm.environment.set(\"authUrl\", \"http://localhost:8001\");",
+									"    pm.environment.set(\"profileUrl\", \"http://localhost:8000\");",
+									"    pm.environment.set(\"orderUrl\", \"http://localhost:8003\");",
+									"    pm.environment.set(\"deliveryUrl\", \"http://localhost:8006\");",
+									"    pm.environment.set(\"notifUrl\", \"http://localhost:8004\");",
+									"    pm.environment.set(\"erpUrl\", \"http://localhost:8005\");",
+									"    pm.environment.set(\"billingUrl\", \"http://localhost:8002\");",
+									"}",
+									"",
+									"pm.variables.set(\"user_1_login\", \"user_\" + Date.now() + \"@mail.ru\")",
+									"pm.variables.set(\"user_1_password\", Date.now())"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{user_1_login}}\",\n    \"password\": \"{{user_1_password}}\",\n    \"firstName\": \"Ivan\",\n    \"lastName\": \"Bezrukov\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{authUrl}}/auth/register",
+							"host": [
+								"{{authUrl}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    pm.variables.set(\"user_1_token\", pm.response.json().access_token)",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.cookies.clear()"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"login\": \"{{user_1_login}}\",\n    \"password\": \"{{user_1_password}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{authUrl}}/auth/getToken",
+							"host": [
+								"{{authUrl}}"
+							],
+							"path": [
+								"auth",
+								"getToken"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "wait... update profile for user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"setTimeout(function(){}, Math.floor(Math.random() * 2000) + 1000);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{user_1_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"age\": 20,\n    \"sex\": \"M\",\n    \"avatarUri\": \"https://avatars.com/1000000123.png\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{profileUrl}}/profile/myProfile",
+							"host": [
+								"{{profileUrl}}"
+							],
+							"path": [
+								"profile",
+								"myProfile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check user balance: 0",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Assert user balance = 0\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.balance).to.eq(\"0.00\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{user_1_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{billingUrl}}/billing/myBalance",
+							"host": [
+								"{{billingUrl}}"
+							],
+							"path": [
+								"billing",
+								"myBalance"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add balance 100 [RUB]",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{user_1_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": 100.00,\n    \"info\": \"Creadit card: XXXX YYYY ZZZZ MMMM\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{billingUrl}}/billing/addBalance",
+							"host": [
+								"{{billingUrl}}"
+							],
+							"path": [
+								"billing",
+								"addBalance"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check balance = 100 [RUB]",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Assert user balance = 100\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(\"100.00\").to.eq(jsonData.balance);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{user_1_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{billingUrl}}/billing/myBalance",
+							"host": [
+								"{{billingUrl}}"
+							],
+							"path": [
+								"billing",
+								"myBalance"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Order 1",
+			"item": [
+				{
+					"name": "get initial stock for products",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"",
+									"    let jsonData = pm.response.json();",
+									"    ",
+									"    let product1 = jsonData.find(item => item.Code === '1');",
+									"    pm.variables.set(\"product1_stock\", product1.Stock);",
+									"",
+									"    let product2 = jsonData.find(item => item.Code === '2');",
+									"    pm.variables.set(\"product2_stock\", product2.Stock);",
+									"    ",
+									"    let product3 = jsonData.find(item => item.Code === '3');",
+									"    pm.variables.set(\"product3_stock\", product3.Stock);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{erpUrl}}/erp/products",
+							"host": [
+								"{{erpUrl}}"
+							],
+							"path": [
+								"erp",
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create order1: balance OK, stock OK, delivery date OK",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"    pm.variables.set(\"orderNum\", pm.response.json().orderNumber);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{user_1_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-RequestId",
+								"value": "{{$guid}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productCode\": \"1\",\n    \"quantity\": 1,\n    \"name\": \"order that should be executed\",\n    \"deliveryDate\": \"2025-03-30\",\n    \"address\": \"Moscow, Lenina 2\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{orderUrl}}/order/create",
+							"host": [
+								"{{orderUrl}}"
+							],
+							"path": [
+								"order",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "wait... check order1 status is 'DELIVERY'",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Assert order status = 'DELIVERY'\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(\"DELIVERY\").to.eq(jsonData.Status);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"setTimeout(function(){}, Math.floor(Math.random() * 2000) + 1000);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{user_1_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{orderUrl}}/order/myOrders/{{orderNum}}",
+							"host": [
+								"{{orderUrl}}"
+							],
+							"path": [
+								"order",
+								"myOrders",
+								"{{orderNum}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check status history for order1: CREATED -> PAYED -> RESERVED -> DELIVERY",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Status: CREATED -> PAYED -> RESERVED -> DELIVERY\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData[0].Text).to.contain('CREATED');",
+									"    pm.expect(jsonData[1].Text).to.contain('PAYED');",
+									"    pm.expect(jsonData[2].Text).to.contain('RESERVED');",
+									"    pm.expect(jsonData[3].Text).to.contain('DELIVERY');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{user_1_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{notifUrl}}/notif/myNotifications/{{orderNum}}",
+							"host": [
+								"{{notifUrl}}"
+							],
+							"path": [
+								"notif",
+								"myNotifications",
+								"{{orderNum}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check balance: changed to 50 [RUB]",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Assert user balance = 50\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.balance).to.eq(\"50.00\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{user_1_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{billingUrl}}/billing/myBalance",
+							"host": [
+								"{{billingUrl}}"
+							],
+							"path": [
+								"billing",
+								"myBalance"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check stock for product1: decreased",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Stock for product1 decreased\", function () {",
+									"    let product1_stock = pm.variables.get(\"product1_stock\");",
+									"    let jsonData = pm.response.json();",
+									"    let product1 = jsonData.find(item => item.Code === '1');",
+									"",
+									"    console.log(\"product1_stock: \" + product1_stock);",
+									"    console.log(\"product1.Stock: \" + product1.Stock);",
+									"",
+									"    pm.expect(parseInt(product1.Stock)).to.eq(parseInt(product1_stock)-1);",
+									"",
+									"    ",
+									"",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{erpUrl}}/erp/products",
+							"host": [
+								"{{erpUrl}}"
+							],
+							"path": [
+								"erp",
+								"products"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Order 2",
+			"item": [
+				{
+					"name": "get initial stock for products",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"",
+									"    let jsonData = pm.response.json();",
+									"    ",
+									"    let product1 = jsonData.find(item => item.Code === '1');",
+									"    pm.variables.set(\"product1_stock\", product1.Stock);",
+									"",
+									"    let product2 = jsonData.find(item => item.Code === '2');",
+									"    pm.variables.set(\"product2_stock\", product2.Stock);",
+									"    ",
+									"    let product3 = jsonData.find(item => item.Code === '3');",
+									"    pm.variables.set(\"product3_stock\", product3.Stock);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{erpUrl}}/erp/products",
+							"host": [
+								"{{erpUrl}}"
+							],
+							"path": [
+								"erp",
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create order2: balance: NOT OK",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"    pm.variables.set(\"orderNum\", pm.response.json().orderNumber);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{user_1_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-RequestId",
+								"value": "{{$guid}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productCode\": \"3\",\n    \"quantity\": 1,\n    \"name\": \"order with very expensive product\",\n    \"deliveryDate\": \"2025-03-30\",\n    \"address\": \"Moscow, Lenina 2\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{orderUrl}}/order/create",
+							"host": [
+								"{{orderUrl}}"
+							],
+							"path": [
+								"order",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "wait... check order2 status is 'PAY_FAILURE'",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Assert order status = 'PAY_FAILURE'\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.Status).to.eq(\"PAY_FAILURE\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"setTimeout(function(){}, Math.floor(Math.random() * 2000) + 1000);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{user_1_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{orderUrl}}/order/myOrders/{{orderNum}}",
+							"host": [
+								"{{orderUrl}}"
+							],
+							"path": [
+								"order",
+								"myOrders",
+								"{{orderNum}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check status history for order2: CREATED -> PAY_FAILURE",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Status: CREATED -> PAY_FAILURE\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData[0].Text).to.contain('CREATED');",
+									"    pm.expect(jsonData[1].Text).to.contain('PAY_FAILURE');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{user_1_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{notifUrl}}/notif/myNotifications/{{orderNum}}",
+							"host": [
+								"{{notifUrl}}"
+							],
+							"path": [
+								"notif",
+								"myNotifications",
+								"{{orderNum}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check balance: still 50 [RUB]",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Assert user balance = 50\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.balance).to.eq(\"50.00\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{user_1_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{billingUrl}}/billing/myBalance",
+							"host": [
+								"{{billingUrl}}"
+							],
+							"path": [
+								"billing",
+								"myBalance"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check stock for product3: not changed",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Stock for product3 not changed\", function () {",
+									"    let product3_stock = pm.variables.get(\"product3_stock\");",
+									"    let jsonData = pm.response.json();",
+									"    let product3 = jsonData.find(item => item.Code === '3');",
+									"",
+									"    console.log(\"product3_stock: \" + product3_stock);",
+									"    console.log(\"product3.Stock: \" + product3.Stock);",
+									"",
+									"    pm.expect(parseInt(product3.Stock)).to.eq(parseInt(product3_stock));",
+									"",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{erpUrl}}/erp/products",
+							"host": [
+								"{{erpUrl}}"
+							],
+							"path": [
+								"erp",
+								"products"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Order 3",
+			"item": [
+				{
+					"name": "get initial stock for products",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"",
+									"    let jsonData = pm.response.json();",
+									"    ",
+									"    let product1 = jsonData.find(item => item.Code === '1');",
+									"    pm.variables.set(\"product1_stock\", product1.Stock);",
+									"",
+									"    let product2 = jsonData.find(item => item.Code === '2');",
+									"    pm.variables.set(\"product2_stock\", product2.Stock);",
+									"    ",
+									"    let product3 = jsonData.find(item => item.Code === '3');",
+									"    pm.variables.set(\"product3_stock\", product3.Stock);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{erpUrl}}/erp/products",
+							"host": [
+								"{{erpUrl}}"
+							],
+							"path": [
+								"erp",
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create order3: balance OK, stock NOT OK",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"    pm.variables.set(\"orderNum\", pm.response.json().orderNumber);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{user_1_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-RequestId",
+								"value": "{{$guid}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productCode\": \"2\",\n    \"quantity\": 1,\n    \"name\": \"order with product out-of-stock\",\n    \"deliveryDate\": \"2025-03-30\",\n    \"address\": \"Moscow, Lenina 2\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{orderUrl}}/order/create",
+							"host": [
+								"{{orderUrl}}"
+							],
+							"path": [
+								"order",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "wait... check order3 status is 'CANCELLED'",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Assert order status = 'CANCELLED'\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.Status).to.eq(\"CANCELLED\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"setTimeout(function(){}, Math.floor(Math.random() * 2000) + 1000);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{user_1_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{orderUrl}}/order/myOrders/{{orderNum}}",
+							"host": [
+								"{{orderUrl}}"
+							],
+							"path": [
+								"order",
+								"myOrders",
+								"{{orderNum}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check status history for order3: CREATED -> PAYED -> MONEY_BACK -> CANCELLED",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Status: CREATED -> PAYED -> MONEY_BACK -> CANCELLED\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData[0].Text).to.contain('CREATED');",
+									"    pm.expect(jsonData[1].Text).to.contain('PAYED');",
+									"    pm.expect(jsonData[2].Text).to.contain('MONEY_BACK');",
+									"    pm.expect(jsonData[3].Text).to.contain('CANCELLED');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{user_1_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{notifUrl}}/notif/myNotifications/{{orderNum}}",
+							"host": [
+								"{{notifUrl}}"
+							],
+							"path": [
+								"notif",
+								"myNotifications",
+								"{{orderNum}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check balance: still 50 [RUB]",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Assert user balance = 50\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.balance).to.eq(\"50.00\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{user_1_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{billingUrl}}/billing/myBalance",
+							"host": [
+								"{{billingUrl}}"
+							],
+							"path": [
+								"billing",
+								"myBalance"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check stock for product2: not changed",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Stock for product2 not changed\", function () {",
+									"    let product2_stock = pm.variables.get(\"product2_stock\");",
+									"    let jsonData = pm.response.json();",
+									"    let product2 = jsonData.find(item => item.Code === '2');",
+									"",
+									"    pm.expect(parseInt(product2.Stock)).to.eq(parseInt(product2_stock));",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{erpUrl}}/erp/products",
+							"host": [
+								"{{erpUrl}}"
+							],
+							"path": [
+								"erp",
+								"products"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Order 4",
+			"item": [
+				{
+					"name": "get initial stock for products",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"",
+									"    let jsonData = pm.response.json();",
+									"    ",
+									"    let product1 = jsonData.find(item => item.Code === '1');",
+									"    pm.variables.set(\"product1_stock\", product1.Stock);",
+									"",
+									"    let product2 = jsonData.find(item => item.Code === '2');",
+									"    pm.variables.set(\"product2_stock\", product2.Stock);",
+									"    ",
+									"    let product3 = jsonData.find(item => item.Code === '3');",
+									"    pm.variables.set(\"product3_stock\", product3.Stock);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{erpUrl}}/erp/products",
+							"host": [
+								"{{erpUrl}}"
+							],
+							"path": [
+								"erp",
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create order4: balance OK, stock OK, delivery date NOT OK",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"    pm.variables.set(\"orderNum\", pm.response.json().orderNumber);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{user_1_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-RequestId",
+								"value": "{{$guid}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productCode\": \"1\",\n    \"quantity\": 1,\n    \"name\": \"Order with wrong delivery date\",\n    \"deliveryDate\": \"2025-01-01\",\n    \"address\": \"Moscow, ul. Lenina 2\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{orderUrl}}/order/create",
+							"host": [
+								"{{orderUrl}}"
+							],
+							"path": [
+								"order",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "wait... check order4 status is 'CANCELLED'",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Assert order status = 'CANCELLED'\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.Status).to.eq(\"CANCELLED\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"setTimeout(function(){}, Math.floor(Math.random() * 2000) + 1000);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{user_1_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{orderUrl}}/order/myOrders/{{orderNum}}",
+							"host": [
+								"{{orderUrl}}"
+							],
+							"path": [
+								"order",
+								"myOrders",
+								"{{orderNum}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check status history for order4: CREATED -> PAYED -> RESERVED -> MONEY_BACK -> CANCELLED",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Status: CREATED -> PAYED -> RESERVED -> MONEY_BACK -> CANCELLED\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData[0].Text).to.contain('CREATED');",
+									"    pm.expect(jsonData[1].Text).to.contain('PAYED');",
+									"    pm.expect(jsonData[2].Text).to.contain('RESERVED');",
+									"    pm.expect(jsonData[3].Text).to.contain('MONEY_BACK');",
+									"    pm.expect(jsonData[4].Text).to.contain('CANCELLED');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{user_1_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{notifUrl}}/notif/myNotifications/{{orderNum}}",
+							"host": [
+								"{{notifUrl}}"
+							],
+							"path": [
+								"notif",
+								"myNotifications",
+								"{{orderNum}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check balance: still 50 [RUB]",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Assert user balance = 50\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.balance).to.eq(\"50.00\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{user_1_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{billingUrl}}/billing/myBalance",
+							"host": [
+								"{{billingUrl}}"
+							],
+							"path": [
+								"billing",
+								"myBalance"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check stock for product1: not changed",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Stock for product1 not changed\", function () {",
+									"    let product1_stock = pm.variables.get(\"product1_stock\");",
+									"    let jsonData = pm.response.json();",
+									"    let product1 = jsonData.find(item => item.Code === '1');",
+									"",
+									"    pm.expect(parseInt(product1.Stock)).to.eq(parseInt(product1_stock));",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{erpUrl}}/erp/products",
+							"host": [
+								"{{erpUrl}}"
+							],
+							"path": [
+								"erp",
+								"products"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Order Idempotence Test",
+			"item": [
+				{
+					"name": "create order without X-RequestId",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{user_1_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productCode\": \"1\",\n    \"quantity\": 1,\n    \"name\": \"order that should be executed\",\n    \"deliveryDate\": \"2025-03-30\",\n    \"address\": \"Moscow, Lenina 2\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{orderUrl}}/order/create",
+							"host": [
+								"{{orderUrl}}"
+							],
+							"path": [
+								"order",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create order with X-RequestId",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);    ",
+									"});",
+									"",
+									"// save order Number",
+									"pm.variables.set(\"orderNum\", pm.response.json().orderNumber);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var uuid = require('uuid');",
+									"pm.variables.set(\"guid1\", uuid.v4());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{user_1_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-RequestId",
+								"value": "{{guid1}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productCode\": \"1\",\n    \"quantity\": 1,\n    \"name\": \"order that should be executed\",\n    \"deliveryDate\": \"2025-03-30\",\n    \"address\": \"Moscow, Lenina 2\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{orderUrl}}/order/create",
+							"host": [
+								"{{orderUrl}}"
+							],
+							"path": [
+								"order",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create order with the same X-RequestId as before",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Assert returned order Number is the same as before\", function () {",
+									"    var prevOrderNum = pm.variables.get(\"prevOrderNum\")",
+									"    var orderNum = pm.response.json().orderNumber;",
+									"",
+									"    // save order Number",
+									"    pm.variables.set(\"orderNum\", orderNum);",
+									"    ",
+									"    console.log(\"prevOrderNum: \" + prevOrderNum);",
+									"    console.log(\"orderNum: \" + orderNum);",
+									"    ",
+									"    pm.expect(orderNum).to.eq(prevOrderNum);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// save previous order number",
+									"pm.variables.set(\"prevOrderNum\", pm.variables.get(\"orderNum\"));"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{user_1_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-RequestId",
+								"value": "{{guid1}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productCode\": \"1\",\n    \"quantity\": 1,\n    \"name\": \"order that should be executed\",\n    \"deliveryDate\": \"2025-03-30\",\n    \"address\": \"Moscow, Lenina 2\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{orderUrl}}/order/create",
+							"host": [
+								"{{orderUrl}}"
+							],
+							"path": [
+								"order",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create order with new X-RequestId",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Assert returned order Number is increased\", function () {",
+									"    var prevOrderNum = pm.variables.get(\"prevOrderNum\");",
+									"    var orderNum = pm.response.json().orderNumber;",
+									"    ",
+									"    console.log(\"prevOrderNum: \" + prevOrderNum);",
+									"    console.log(\"orderNum: \" + orderNum);",
+									"    ",
+									"    pm.expect(orderNum).to.gt(prevOrderNum);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.variables.set(\"prevOrderNum\", pm.variables.get(\"orderNum\"));"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{user_1_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-RequestId",
+								"value": "{{$guid}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productCode\": \"1\",\n    \"quantity\": 1,\n    \"name\": \"order that should be executed\",\n    \"deliveryDate\": \"2025-03-30\",\n    \"address\": \"Moscow, Lenina 2\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{orderUrl}}/order/create",
+							"host": [
+								"{{orderUrl}}"
+							],
+							"path": [
+								"order",
+								"create"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
